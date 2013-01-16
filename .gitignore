@@ -1,0 +1,7 @@
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+clgol
+cmake/*
+cmake_install.cmake
+
