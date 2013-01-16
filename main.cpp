@@ -7,19 +7,8 @@
 #include <iostream>
 #include <sstream>
 
-#if defined _WIN32
-	#include <windows.h>
-#elif defined __linux__
-	#include <GL/glx.h>
-#endif
-
 #include <ctime>
 #include <cmath>
-
-// OpenCL libraries
-#define __NO_STD_VECTOR // Use cl::vector instead of STL version
-#include <CL/cl.h>
-#include <CL/cl_gl.h>
 
 // OpenGL libraries
 #include <GL/glew.h>
@@ -27,9 +16,20 @@
 #define GLFW_INCLUDE_GL3
 #include <GL/glfw.h>
 
+#if defined _WIN32
+	#include <windows.h>
+#elif defined __linux__
+	#include <GL/glx.h>
+#endif
+
+// OpenCL libraries
+#define __NO_STD_VECTOR // Use cl::vector instead of STL version
+#include <CL/cl.h>
+#include <CL/cl_gl.h>
+
 // GL math libraries
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // Unility library
 #include "utils.hpp"
@@ -41,6 +41,8 @@
 #define CELL		8
 
 #define FPS			60
+
+namespace clgol {
 
 // Static data
 static const GLfloat g_vertex_buffer_data[] = {
@@ -102,6 +104,10 @@ cl_mem 				universe_buffer, update_buffer;
 cl_mem				buffers[] = {universe_buffer, update_buffer};
 
 cl_sampler			sampler;
+
+}
+
+using namespace clgol;
 
 void randomize() {
 	const size_t origin[] = {0, 0, 0};
@@ -189,7 +195,7 @@ void GLFWCALL key_handler(int key, int action) {
 			exit_handler(0);
 			break;
 		case GLFW_KEY_SPACE:
-			pause = !pause;
+			clgol::pause = !clgol::pause;
 			break;
 		case GLFW_KEY_KP_ADD:
 			speed++;
@@ -545,7 +551,7 @@ int main() {
     	glfwSwapBuffers();
 
     	frame++;
-    	if(!(frame % speed) && !pause) {
+    	if(!(frame % speed) && !clgol::pause) {
     		clEnqueueAcquireGLObjects(queue, 2, buffers, 0, NULL, NULL);
 
     		clSetKernelArg(kernel, 0, sizeof(cl_mem), &universe_buffer);
